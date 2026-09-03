@@ -14,6 +14,9 @@ importers:
       '@tauri-apps/plugin-opener':
         specifier: ^2
         version: 2.5.5
+      uikit:
+        specifier: ^3.25.21
+        version: 3.25.21
       vue:
         specifier: ^3.5.13
         version: 3.5.42(typescript@5.6.3)
@@ -21,6 +24,9 @@ importers:
       '@tauri-apps/cli':
         specifier: ^2
         version: 2.11.4
+      '@types/uikit':
+        specifier: ^3.23.0
+        version: 3.23.0
       '@vitejs/plugin-vue':
         specifier: ^5.2.1
         version: 5.2.4(vite@6.4.3)(vue@3.5.42(typescript@5.6.3))
@@ -442,6 +448,9 @@ packages:
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
+  '@types/uikit@3.23.0':
+    resolution: {integrity: sha512-GTn8/K+f4AjFxtLqRKWzjaVKckQp/rHcl20IO09salh2VjyFb9CqeFugL95skO6qbbJLil3PE1MmNajrSj5gMg==}
+
   '@vitejs/plugin-vue@5.2.4':
     resolution: {integrity: sha512-7Yx/SXSOcQq5HiiV3orevHUFn+pmMB4cgbEkDYgnkUWb0WfeQ/wa2yFv6D5ICiCQOVpjA7vYDXrC7AGO8yjDHA==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -592,6 +601,9 @@ packages:
     resolution: {integrity: sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  uikit@3.25.21:
+    resolution: {integrity: sha512-tq33ic/VGgjbezs7Nd5vG4/bvBLqHzZlS9UHNr1pre1gUSl3usW9avah0lf+8ILzbAL7xc6IBsVTaTU6TMkfHw==}
 
   vite@6.4.3:
     resolution: {integrity: sha512-NTKlcQjlAK7MlQoyb6LgaqHc8sso/pVyUJYWMws3jg21uTJw/LddqIFPcPqP6PzpgbIcZyKI85sFE4HBrQDA8A==}
@@ -878,6 +890,8 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
+  '@types/uikit@3.23.0': {}
+
   '@vitejs/plugin-vue@5.2.4(vite@6.4.3)(vue@3.5.42(typescript@5.6.3))':
     dependencies:
       vite: 6.4.3
@@ -1087,6 +1101,8 @@ snapshots:
       picomatch: 4.0.7
 
   typescript@5.6.3: {}
+
+  uikit@3.25.21: {}
 
   vite@6.4.3:
     dependencies:

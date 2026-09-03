@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
 
-declare module "*.vue" {
-  import type { DefineComponent } from "vue";
-  const component: DefineComponent<{}, {}, any>;
-  export default component;
+declare module 'uikit/dist/js/uikit-icons' {
+  const Icons: (uikit: typeof import('uikit')) => void;
+  export default Icons;
 }
