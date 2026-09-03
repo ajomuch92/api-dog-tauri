@@ -1,4 +1,5 @@
 use super::project_args;
+use super::blocking;
 use crate::apidog::{Cli, CliError, ErrorKind};
 use serde::Deserialize;
 use serde_json::Value;
@@ -28,7 +29,11 @@ pub struct EndpointFields {
 }
 
 #[tauri::command]
-pub fn list_endpoints(project_id: String, filters: Option<EndpointFilters>) -> Result<Value, CliError> {
+pub async fn list_endpoints(project_id: String, filters: Option<EndpointFilters>) -> Result<Value, CliError> {
+    blocking(move || list_endpoints_blocking(project_id, filters)).await
+}
+
+pub(crate) fn list_endpoints_blocking(project_id: String, filters: Option<EndpointFilters>) -> Result<Value, CliError> {
     let f = filters.unwrap_or_default();
     let mut args: Vec<String> = vec!["endpoint".into(), "list".into()];
     args.extend(project_args(&project_id));
@@ -42,7 +47,11 @@ pub fn list_endpoints(project_id: String, filters: Option<EndpointFilters>) -> R
 }
 
 #[tauri::command]
-pub fn get_endpoint(project_id: String, endpoint_id: String) -> Result<Value, CliError> {
+pub async fn get_endpoint(project_id: String, endpoint_id: String) -> Result<Value, CliError> {
+    blocking(move || get_endpoint_blocking(project_id, endpoint_id)).await
+}
+
+pub(crate) fn get_endpoint_blocking(project_id: String, endpoint_id: String) -> Result<Value, CliError> {
     let mut args: Vec<String> = vec!["endpoint".into(), "get".into(), endpoint_id];
     args.extend(project_args(&project_id));
     Cli::run(args)
@@ -51,7 +60,11 @@ pub fn get_endpoint(project_id: String, endpoint_id: String) -> Result<Value, Cl
 /// Crea un endpoint. El payload sigue el esquema `endpoint-create`; se
 /// valida con el CLI antes de escribir.
 #[tauri::command]
-pub fn create_endpoint(project_id: String, payload: Value) -> Result<Value, CliError> {
+pub async fn create_endpoint(project_id: String, payload: Value) -> Result<Value, CliError> {
+    blocking(move || create_endpoint_blocking(project_id, payload)).await
+}
+
+pub(crate) fn create_endpoint_blocking(project_id: String, payload: Value) -> Result<Value, CliError> {
     ensure_object(&payload)?;
     Cli::validate("endpoint-create", &payload)?;
     let args = ["endpoint", "create", "--project", project_id.as_str()];
@@ -61,7 +74,15 @@ pub fn create_endpoint(project_id: String, payload: Value) -> Result<Value, CliE
 /// Actualiza campos simples mediante flags (más seguro que `--file`, que
 /// sobreescribe estructuras completas).
 #[tauri::command]
-pub fn update_endpoint_fields(
+pub async fn update_endpoint_fields(
+    project_id: String,
+    endpoint_id: String,
+    fields: EndpointFields,
+) -> Result<Value, CliError> {
+    blocking(move || update_endpoint_fields_blocking(project_id, endpoint_id, fields)).await
+}
+
+pub(crate) fn update_endpoint_fields_blocking(
     project_id: String,
     endpoint_id: String,
     fields: EndpointFields,
@@ -87,7 +108,15 @@ pub fn update_endpoint_fields(
 
 /// Reemplaza el endpoint completo con un JSON (esquema `endpoint-update`).
 #[tauri::command]
-pub fn update_endpoint_json(
+pub async fn update_endpoint_json(
+    project_id: String,
+    endpoint_id: String,
+    payload: Value,
+) -> Result<Value, CliError> {
+    blocking(move || update_endpoint_json_blocking(project_id, endpoint_id, payload)).await
+}
+
+pub(crate) fn update_endpoint_json_blocking(
     project_id: String,
     endpoint_id: String,
     payload: Value,
@@ -99,7 +128,11 @@ pub fn update_endpoint_json(
 }
 
 #[tauri::command]
-pub fn delete_endpoint(project_id: String, endpoint_id: String) -> Result<Value, CliError> {
+pub async fn delete_endpoint(project_id: String, endpoint_id: String) -> Result<Value, CliError> {
+    blocking(move || delete_endpoint_blocking(project_id, endpoint_id)).await
+}
+
+pub(crate) fn delete_endpoint_blocking(project_id: String, endpoint_id: String) -> Result<Value, CliError> {
     let mut args: Vec<String> = vec!["endpoint".into(), "delete".into(), endpoint_id];
     args.extend(project_args(&project_id));
     Cli::run(args)

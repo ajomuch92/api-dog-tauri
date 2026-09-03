@@ -1,3 +1,4 @@
+use super::blocking;
 use crate::apidog::{Cli, CliError, ErrorKind};
 use serde::Serialize;
 use serde_json::Value;
@@ -17,7 +18,18 @@ pub struct CliStatus {
 
 /// Diagnóstico completo: ¿está instalado el CLI? ¿hay sesión?
 #[tauri::command]
-pub fn cli_status() -> CliStatus {
+pub async fn cli_status() -> CliStatus {
+    blocking(move || Ok(cli_status_blocking())).await.unwrap_or_else(|e| CliStatus {
+        installed: true,
+        binary_path: None,
+        version: None,
+        logged_in: false,
+        user: None,
+        error: Some(e),
+    })
+}
+
+pub(crate) fn cli_status_blocking() -> CliStatus {
     let Some(bin) = Cli::binary() else {
         return CliStatus {
             installed: false,
@@ -47,7 +59,11 @@ pub fn cli_status() -> CliStatus {
 }
 
 #[tauri::command]
-pub fn auth_login(token: String, api_base_url: Option<String>) -> Result<Value, CliError> {
+pub async fn auth_login(token: String, api_base_url: Option<String>) -> Result<Value, CliError> {
+    blocking(move || auth_login_blocking(token, api_base_url)).await
+}
+
+pub(crate) fn auth_login_blocking(token: String, api_base_url: Option<String>) -> Result<Value, CliError> {
     let token = token.trim().to_string();
     if token.is_empty() {
         return Err(CliError::new(ErrorKind::Validation, "El access token es obligatorio"));
@@ -63,7 +79,11 @@ pub fn auth_login(token: String, api_base_url: Option<String>) -> Result<Value, 
 }
 
 #[tauri::command]
-pub fn auth_logout() -> Result<(), CliError> {
+pub async fn auth_logout() -> Result<(), CliError> {
+    blocking(move || auth_logout_blocking()).await
+}
+
+pub(crate) fn auth_logout_blocking() -> Result<(), CliError> {
     Cli::run(["auth", "logout"]).map(|_| ())
 }
 
@@ -75,7 +95,7 @@ mod tests {
     #[test]
     #[ignore]
     fn cli_status_reports_logged_in_session() {
-        let status = cli_status();
+        let status = cli_status_blocking();
         assert!(status.installed, "apidog no encontrado");
         assert!(status.logged_in, "sin sesión: {:?}", status.error);
         assert!(status.user.is_some());
@@ -85,21 +105,21 @@ mod tests {
     #[test]
     #[ignore]
     fn list_projects_and_endpoints_roundtrip() {
-        let projects = crate::commands::projects::list_projects(None).expect("project list");
+        let projects = crate::commands::projects::list_projects_blocking(None).expect("project list");
         let first = projects.as_array().and_then(|a| a.first()).expect("al menos un proyecto");
         let id = first["id"].to_string();
-        let endpoints = crate::commands::endpoints::list_endpoints(id.clone(), None).expect("endpoint list");
+        let endpoints = crate::commands::endpoints::list_endpoints_blocking(id.clone(), None).expect("endpoint list");
         assert!(endpoints.is_array(), "endpoints: {}", { let t = serde_json::to_string(&endpoints).unwrap_or_default(); format!("len={} tail={}", t.len(), t.chars().rev().take(200).collect::<String>().chars().rev().collect::<String>()) });
-        let folders = crate::commands::folders::list_folders(id.clone(), None).expect("folder list");
+        let folders = crate::commands::folders::list_folders_blocking(id.clone(), None).expect("folder list");
         assert!(folders.is_array());
-        let envs = crate::commands::environments::list_environments(id).expect("environment list");
+        let envs = crate::commands::environments::list_environments_blocking(id).expect("environment list");
         assert!(envs.is_array());
     }
 
     #[test]
     #[ignore]
     fn validation_error_is_typed() {
-        let err = crate::commands::endpoints::create_endpoint("1".into(), serde_json::json!({"name": "x"}))
+        let err = crate::commands::endpoints::create_endpoint_blocking("1".into(), serde_json::json!({"name": "x"}))
             .expect_err("debe fallar la validación");
         assert_eq!(err.kind, ErrorKind::Validation, "{err:?}");
         assert!(err.suggestion.is_some());

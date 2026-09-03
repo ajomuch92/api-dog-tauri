@@ -1,5 +1,6 @@
 use super::endpoints::push_opt;
 use super::project_args;
+use super::blocking;
 use crate::apidog::{Cli, CliError, ErrorKind};
 use serde_json::{json, Value};
 
@@ -10,7 +11,11 @@ fn folder_type(t: Option<String>) -> String {
 }
 
 #[tauri::command]
-pub fn list_folders(project_id: String, folder_type_name: Option<String>) -> Result<Value, CliError> {
+pub async fn list_folders(project_id: String, folder_type_name: Option<String>) -> Result<Value, CliError> {
+    blocking(move || list_folders_blocking(project_id, folder_type_name)).await
+}
+
+pub(crate) fn list_folders_blocking(project_id: String, folder_type_name: Option<String>) -> Result<Value, CliError> {
     let mut args: Vec<String> = vec!["folder".into(), "list".into()];
     args.extend(project_args(&project_id));
     args.push("--type".into());
@@ -19,7 +24,16 @@ pub fn list_folders(project_id: String, folder_type_name: Option<String>) -> Res
 }
 
 #[tauri::command]
-pub fn create_folder(
+pub async fn create_folder(
+    project_id: String,
+    name: String,
+    parent_id: Option<i64>,
+    folder_type_name: Option<String>,
+) -> Result<Value, CliError> {
+    blocking(move || create_folder_blocking(project_id, name, parent_id, folder_type_name)).await
+}
+
+pub(crate) fn create_folder_blocking(
     project_id: String,
     name: String,
     parent_id: Option<i64>,
@@ -40,7 +54,18 @@ pub fn create_folder(
 }
 
 #[tauri::command]
-pub fn update_folder(
+pub async fn update_folder(
+    project_id: String,
+    folder_id: String,
+    name: Option<String>,
+    description: Option<String>,
+    parent_id: Option<i64>,
+    folder_type_name: Option<String>,
+) -> Result<Value, CliError> {
+    blocking(move || update_folder_blocking(project_id, folder_id, name, description, parent_id, folder_type_name)).await
+}
+
+pub(crate) fn update_folder_blocking(
     project_id: String,
     folder_id: String,
     name: Option<String>,
@@ -66,7 +91,15 @@ pub fn update_folder(
 }
 
 #[tauri::command]
-pub fn delete_folder(
+pub async fn delete_folder(
+    project_id: String,
+    folder_id: String,
+    folder_type_name: Option<String>,
+) -> Result<Value, CliError> {
+    blocking(move || delete_folder_blocking(project_id, folder_id, folder_type_name)).await
+}
+
+pub(crate) fn delete_folder_blocking(
     project_id: String,
     folder_id: String,
     folder_type_name: Option<String>,
