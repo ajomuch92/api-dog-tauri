@@ -3,6 +3,7 @@ import { useCliStatus } from '@/composables/useCliStatus';
 import { useNotify } from '@/composables/useNotify';
 import { useBusy } from '@/composables/useBusy';
 import { useSession } from '@/stores/session';
+import ThemeToggle from '@/components/common/ThemeToggle.vue';
 
 const { status, checking, logout, refresh } = useCliStatus();
 const { withBlocking } = useBusy();
@@ -37,6 +38,7 @@ async function onLogout() {
         <span v-if="status?.user">{{ status.user.email }}</span>
       </div>
       <div class="uk-navbar-item">
+        <ThemeToggle class="uk-margin-small-right" />
         <span v-if="checking" class="uk-margin-small-right uk-icon-button" uk-spinner="ratio: 0.6"></span>
         <button v-else class="uk-icon-button uk-margin-small-right" uk-icon="refresh" uk-tooltip="Revisar estado del CLI" @click="refresh"></button>
         <button class="uk-icon-button" uk-icon="sign-out" uk-tooltip="Cerrar sesión" @click="onLogout"></button>

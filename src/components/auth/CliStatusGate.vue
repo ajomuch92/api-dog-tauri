@@ -2,12 +2,14 @@
 import { useCliStatus } from '@/composables/useCliStatus';
 import ErrorAlert from '@/components/common/ErrorAlert.vue';
 import LoginForm from './LoginForm.vue';
+import ThemeToggle from '@/components/common/ThemeToggle.vue';
 
 const { status, checking, refresh } = useCliStatus();
 </script>
 
 <template>
   <div class="uk-flex uk-flex-center uk-flex-middle gate">
+    <ThemeToggle class="gate-theme-toggle" />
     <div class="uk-card uk-card-default uk-card-body uk-width-large">
       <h2 class="uk-card-title uk-margin-small-bottom">
         <span uk-icon="icon: bolt; ratio: 1.3" class="uk-margin-small-right"></span>Apidog Client

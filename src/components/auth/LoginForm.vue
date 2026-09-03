@@ -40,7 +40,7 @@ async function submit() {
       <input id="token" v-model="token" class="uk-input" type="password" autocomplete="off" placeholder="APS-..." required />
     </div>
     <div class="uk-margin-small">
-      <a href="#" class="uk-text-small" @click.prevent="showAdvanced = !showAdvanced">
+      <a href="#" class="uk-text-small gate-link" @click.prevent="showAdvanced = !showAdvanced">
         {{ showAdvanced ? 'Ocultar' : 'Mostrar' }} opciones avanzadas
       </a>
     </div>

@@ -8,6 +8,7 @@
  *   (por defecto)      → sesión activa con el primer proyecto/endpoint seleccionados
  */
 import { useSession } from '@/stores/session';
+import { useTheme } from '@/composables/useTheme';
 import type { CliError, CliStatus, EndpointDetail, EndpointSummary, Folder } from '@/types/apidog';
 import * as fx from './fixtures';
 
@@ -150,5 +151,8 @@ if (scenario === 'app') {
     if (params.get('send')) setTimeout(() => click('[data-action="send"]'), 1400);
   }
 }
+
+const themeParam = new URLSearchParams(location.search).get('theme');
+if (themeParam === 'dark' || themeParam === 'light') useTheme().setPreference(themeParam);
 
 console.info(`[mockTauri] escenario "${scenario}" activo`);

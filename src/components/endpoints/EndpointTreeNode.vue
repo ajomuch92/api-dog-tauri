@@ -12,7 +12,9 @@ const emit = defineEmits<{
   (e: 'delete-folder', folder: Folder): void;
 }>();
 
-const open = ref(props.depth === 0 || props.forceOpen);
+// Todas las carpetas inician colapsadas; se abren al hacer clic o
+// automáticamente cuando hay filtros activos (forceOpen).
+const open = ref(props.forceOpen);
 watch(() => props.forceOpen, (v) => v && (open.value = true));
 
 const isVirtual = () => props.node.folder.id === 0;

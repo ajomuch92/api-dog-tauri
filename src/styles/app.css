@@ -1,7 +1,25 @@
 :root {
   --app-header-height: 56px;
-  --app-border: #e5e5e5;
+  --app-bg: #ffffff;
   --app-muted-bg: #fafafa;
+  --app-surface: #ffffff;
+  --app-border: #e5e5e5;
+  --app-text: #333333;
+  --app-text-muted: #666666;
+  --app-text-faint: #999999;
+  --app-hover: #f3f3f3;
+  --app-hover-strong: #eeeeee;
+  --app-chip-bg: #e5e5e5;
+  --app-code-bg: #f7f7f7;
+  --app-primary: #1e87f0;
+  --app-primary-soft: #e3f0fd;
+  --app-overlay: rgba(255, 255, 255, 0.6);
+  --app-panel-veil: rgba(255, 255, 255, 0.5);
+  --json-key: #7b1fa2;
+  --json-string: #2e7d32;
+  --json-number: #1565c0;
+  --json-boolean: #ef6c00;
+  --json-null: #9e9e9e;
   --method-get: #2e7d32;
   --method-post: #1565c0;
   --method-put: #ef6c00;
@@ -18,7 +36,9 @@ body,
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background: #fff;
+  background: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ---------- Layout ---------- */
@@ -92,12 +112,12 @@ body,
   margin-bottom: 4px;
 }
 .project-card:hover {
-  background: #eee;
+  background: var(--app-hover-strong);
   color: inherit;
   text-decoration: none;
 }
 .project-card.active {
-  background: #1e87f0;
+  background: var(--app-primary);
   color: #fff;
 }
 .project-card.active .uk-text-muted,
@@ -122,11 +142,11 @@ body,
   user-select: none;
 }
 .tree-folder:hover {
-  background: #f3f3f3;
+  background: var(--app-hover);
 }
 .tree-caret {
   width: 16px;
-  color: #999;
+  color: var(--app-text-faint);
 }
 .tree-folder-name {
   flex: 1;
@@ -134,8 +154,8 @@ body,
   font-size: 0.9rem;
 }
 .tree-count {
-  background: #e5e5e5;
-  color: #666;
+  background: var(--app-chip-bg);
+  color: var(--app-text-muted);
   min-width: 20px;
 }
 .tree-actions {
@@ -166,13 +186,13 @@ body,
   font-size: 0.9rem;
 }
 .endpoint-item:hover {
-  background: #f3f3f3;
+  background: var(--app-hover);
   color: inherit;
   text-decoration: none;
 }
 .endpoint-item.active {
-  background: #e3f0fd;
-  color: #1e87f0;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
 }
 
 /* ---------- Método HTTP ---------- */
@@ -223,7 +243,7 @@ body,
 .detail-path {
   background: transparent;
   padding: 0;
-  color: #666;
+  color: var(--app-text-muted);
 }
 .detail-body {
   padding-top: 8px;
@@ -233,13 +253,14 @@ body,
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #666;
+  color: var(--app-text-muted);
 }
 
 /* ---------- JSON / código ---------- */
 .json-viewer,
 .raw-output {
-  background: #f7f7f7;
+  background: var(--app-code-bg);
+  color: var(--app-text);
   border: 1px solid var(--app-border);
   border-radius: 4px;
   padding: 10px 12px;
@@ -248,11 +269,11 @@ body,
   white-space: pre-wrap;
   word-break: break-word;
 }
-.json-key { color: #7b1fa2; }
-.json-string { color: #2e7d32; }
-.json-number { color: #1565c0; }
-.json-boolean { color: #ef6c00; }
-.json-null { color: #9e9e9e; }
+.json-key { color: var(--json-key); }
+.json-string { color: var(--json-string); }
+.json-number { color: var(--json-number); }
+.json-boolean { color: var(--json-boolean); }
+.json-null { color: var(--json-null); }
 .code-editor {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.8rem;
@@ -303,7 +324,7 @@ body,
   top: 0;
   bottom: 0;
   width: 35%;
-  background: #1e87f0;
+  background: var(--app-primary);
   animation: progress-slide 1.1s ease-in-out infinite;
 }
 @keyframes progress-slide {
@@ -317,7 +338,7 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--app-overlay);
   backdrop-filter: blur(1px);
 }
 .busy-card {
@@ -331,7 +352,7 @@ body,
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--app-panel-veil);
   pointer-events: none;
 }
 .fade-enter-active,
@@ -341,4 +362,194 @@ body,
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* ---------- Toggle de tema ---------- */
+.theme-toggle svg {
+  display: block;
+}
+.gate-theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+}
+
+/* ---------- Tema oscuro ----------
+   `uk-light` (modo invertido de UIkit) se aplica al <html> desde useTheme y
+   cubre texto, formularios, tabs, tablas y navbar. Aquí van las variables y
+   los componentes con fondo fijo que UIkit no invierte. */
+[data-theme='dark'] {
+  --app-bg: #16181d;
+  --app-muted-bg: #1c1f26;
+  --app-surface: #22262e;
+  --app-border: #30353f;
+  --app-text: #e6e8ec;
+  --app-text-muted: #a0a6b1;
+  --app-text-faint: #6f7683;
+  --app-hover: #2a2f38;
+  --app-hover-strong: #303642;
+  --app-chip-bg: #343a45;
+  --app-code-bg: #1b1e25;
+  --app-primary: #4da3ff;
+  --app-primary-soft: rgba(77, 163, 255, 0.18);
+  --app-overlay: rgba(22, 24, 29, 0.65);
+  --app-panel-veil: rgba(22, 24, 29, 0.5);
+  --json-key: #c792ea;
+  --json-string: #8bd48b;
+  --json-number: #82aaff;
+  --json-boolean: #ffb86c;
+  --json-null: #7f8794;
+  --method-get: #3fa34d;
+  --method-post: #3b82f6;
+  --method-put: #f59e0b;
+  --method-patch: #a855f7;
+  --method-delete: #ef4444;
+  --method-head: #14b8a6;
+  --method-options: #64748b;
+  --method-other: #6b7280;
+}
+[data-theme='dark'] .uk-navbar-container:not(.uk-navbar-transparent) {
+  background: var(--app-muted-bg);
+}
+[data-theme='dark'] .uk-card-default,
+[data-theme='dark'] .uk-modal-dialog,
+[data-theme='dark'] .uk-modal-header,
+[data-theme='dark'] .uk-modal-footer,
+[data-theme='dark'] .uk-notification-message,
+[data-theme='dark'] .uk-dropdown {
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+[data-theme='dark'] .uk-card-default {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+[data-theme='dark'] .uk-modal-header {
+  border-bottom-color: var(--app-border);
+}
+[data-theme='dark'] .uk-modal-footer {
+  border-top-color: var(--app-border);
+}
+[data-theme='dark'] .uk-modal-title,
+[data-theme='dark'] .uk-card-title {
+  color: var(--app-text);
+}
+[data-theme='dark'] .gate-link,
+[data-theme='dark'] .uk-link {
+  color: var(--app-primary);
+}
+[data-theme='dark'] .uk-modal {
+  background: rgba(0, 0, 0, 0.7);
+}
+[data-theme='dark'] .uk-notification-message {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+[data-theme='dark'] .uk-alert {
+  background: var(--app-hover);
+  color: var(--app-text);
+}
+[data-theme='dark'] .uk-alert-danger {
+  background: rgba(240, 80, 110, 0.15);
+  color: #ff8aa0;
+}
+[data-theme='dark'] code {
+  background: var(--app-code-bg);
+  color: #ff8aa0;
+}
+[data-theme='dark'] pre {
+  background: var(--app-code-bg);
+  color: var(--app-text);
+  border-color: var(--app-border);
+}
+/* uk-light vuelve blancos los labels y el botón primario; restauramos color */
+[data-theme='dark'] .uk-label {
+  background: var(--app-primary);
+  color: #fff;
+}
+[data-theme='dark'] .uk-label-success {
+  background: #32d296;
+}
+[data-theme='dark'] .uk-label-warning {
+  background: #faa05a;
+}
+[data-theme='dark'] .uk-label-danger {
+  background: #f0506e;
+}
+[data-theme='dark'] .uk-button-primary,
+[data-theme='dark'] .uk-subnav-pill > .uk-active > a {
+  background: var(--app-primary);
+  color: #fff;
+}
+[data-theme='dark'] .uk-button-primary:hover {
+  background: #2f8ff5;
+  color: #fff;
+}
+[data-theme='dark'] .uk-button-default {
+  border-color: var(--app-border);
+}
+[data-theme='dark'] .uk-button-danger {
+  background: #f0506e;
+  color: #fff;
+}
+[data-theme='dark'] .uk-badge {
+  background: var(--app-chip-bg);
+  color: var(--app-text);
+}
+[data-theme='dark'] .uk-input,
+[data-theme='dark'] .uk-select,
+[data-theme='dark'] .uk-textarea {
+  background: var(--app-code-bg);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+[data-theme='dark'] .uk-input:focus,
+[data-theme='dark'] .uk-select:focus,
+[data-theme='dark'] .uk-textarea:focus {
+  background: var(--app-code-bg);
+  border-color: var(--app-primary);
+}
+[data-theme='dark'] .uk-select option {
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+[data-theme='dark'] .uk-table th {
+  color: var(--app-text-muted);
+}
+[data-theme='dark'] .uk-table-divider > tr:not(:first-child),
+[data-theme='dark'] .uk-table-divider > :not(:first-child) > tr,
+[data-theme='dark'] .uk-table-divider > :first-child > tr:not(:first-child) {
+  border-top-color: var(--app-border);
+}
+[data-theme='dark'] .uk-tab::before {
+  border-bottom-color: var(--app-border);
+}
+[data-theme='dark'] .uk-tab > .uk-active > a {
+  color: var(--app-primary);
+  border-color: var(--app-primary);
+}
+[data-theme='dark'] .uk-icon-button {
+  background: var(--app-hover);
+  color: var(--app-text-muted);
+}
+[data-theme='dark'] .uk-icon-button:hover {
+  background: var(--app-hover-strong);
+  color: var(--app-text);
+}
+[data-theme='dark'] .uk-text-muted,
+[data-theme='dark'] .uk-text-meta {
+  color: var(--app-text-muted) !important;
+}
+[data-theme='dark'] .uk-form-label {
+  color: var(--app-text);
+}
+[data-theme='dark'] .uk-checkbox {
+  border-color: var(--app-text-faint);
+}
+[data-theme='dark'] .uk-close {
+  color: var(--app-text-muted);
+}
+[data-theme='dark'] details summary {
+  color: var(--app-text-muted);
+}
+[data-theme='dark'] .busy-card {
+  background: var(--app-surface);
 }
