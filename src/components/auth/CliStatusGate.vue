@@ -3,7 +3,7 @@ import { useCliStatus } from '@/composables/useCliStatus';
 import ErrorAlert from '@/components/common/ErrorAlert.vue';
 import LoginForm from './LoginForm.vue';
 
-const { status, refresh } = useCliStatus();
+const { status, checking, refresh } = useCliStatus();
 </script>
 
 <template>
@@ -22,8 +22,9 @@ const { status, refresh } = useCliStatus();
           Si ya está instalado pero no se detecta, define la variable de entorno
           <code>APIDOG_CLI</code> con la ruta completa al binario.
         </p>
-        <button class="uk-button uk-button-primary" @click="refresh">
-          <span uk-icon="refresh" class="uk-margin-small-right"></span>Volver a comprobar
+        <button class="uk-button uk-button-primary" :disabled="checking" @click="refresh">
+          <span v-if="checking" uk-spinner="ratio: 0.6" class="uk-margin-small-right"></span>
+          <span v-else uk-icon="refresh" class="uk-margin-small-right"></span>Volver a comprobar
         </button>
       </template>
 

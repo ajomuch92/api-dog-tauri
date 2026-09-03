@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import ErrorAlert from '@/components/common/ErrorAlert.vue';
 import { useAsync } from '@/composables/useAsync';
 import { useNotify } from '@/composables/useNotify';
+import { useBusy } from '@/composables/useBusy';
 import { apidog } from '@/services/apidog';
 import { useSession } from '@/stores/session';
 import type { EndpointDetail, Environment, Folder, GlobalVariable } from '@/types/apidog';
@@ -24,6 +25,7 @@ const props = defineProps<{
 
 const { selectEndpoint, bumpRevision } = useSession();
 const notify = useNotify();
+const { withBlocking } = useBusy();
 const { data: endpoint, loading, error, run } = useAsync<EndpointDetail | null>(null);
 
 type Tab = 'overview' | 'request' | 'json';
@@ -38,7 +40,7 @@ async function remove() {
   const ok = await notify.confirm(`¿Eliminar el endpoint "${endpoint.value.name}"?`, 'Eliminar');
   if (!ok) return;
   try {
-    await apidog.deleteEndpoint(props.projectId, props.endpointId);
+    await withBlocking(`Eliminando "${endpoint.value.name}"…`, () => apidog.deleteEndpoint(props.projectId, props.endpointId));
     notify.success('Endpoint eliminado');
     selectEndpoint(null);
     bumpRevision();
@@ -70,7 +72,8 @@ function onSaved(message: string) {
           <span :class="statusClass(endpoint.status)" class="uk-margin-small-left uk-flex-none">{{ endpoint.status }}</span>
         </div>
         <div class="uk-flex-none detail-actions">
-          <button class="uk-icon-button" uk-icon="refresh" uk-tooltip="Recargar" :disabled="loading" @click="load"></button>
+          <span v-if="loading" class="uk-icon-button" uk-spinner="ratio: 0.6"></span>
+          <button v-else class="uk-icon-button" uk-icon="refresh" uk-tooltip="Recargar" @click="load"></button>
           <button class="uk-icon-button" uk-icon="pencil" uk-tooltip="Editar" @click="showEdit = true"></button>
           <button class="uk-icon-button detail-delete" uk-icon="trash" uk-tooltip="Eliminar" @click="remove"></button>
         </div>
@@ -82,7 +85,7 @@ function onSaved(message: string) {
         <li :class="{ 'uk-active': tab === 'json' }"><a href="#" data-tab="json" @click.prevent="tab = 'json'">JSON</a></li>
       </ul>
 
-      <div class="detail-body">
+      <div class="detail-body" :class="{ 'panel-loading': loading }">
         <EndpointOverview v-if="tab === 'overview'" :endpoint="endpoint" />
         <RequestRunner
           v-else-if="tab === 'request'"

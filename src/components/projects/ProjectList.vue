@@ -17,9 +17,10 @@ onMounted(load);
   <div class="panel">
     <div class="panel-toolbar">
       <span class="uk-text-bold uk-text-small uk-text-uppercase">Proyectos</span>
-      <button class="uk-icon-button uk-icon-button-small" uk-icon="refresh" uk-tooltip="Recargar" :disabled="loading" @click="load"></button>
+      <span v-if="loading" uk-spinner="ratio: 0.6"></span>
+      <button v-else class="uk-icon-button uk-icon-button-small" uk-icon="refresh" uk-tooltip="Recargar" @click="load"></button>
     </div>
-    <div class="panel-content">
+    <div class="panel-content" :class="{ 'panel-loading': loading && projects.length }">
       <LoadingSpinner v-if="loading && !projects.length" label="Cargando proyectos…" />
       <ErrorAlert :error="error" compact />
       <EmptyState v-if="!loading && !error && !projects.length" icon="folder" title="Sin proyectos" />

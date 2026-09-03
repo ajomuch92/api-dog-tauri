@@ -7,6 +7,7 @@ import FolderForm from '@/components/folders/FolderForm.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import ErrorAlert from '@/components/common/ErrorAlert.vue';
 import { useNotify } from '@/composables/useNotify';
+import { useBusy } from '@/composables/useBusy';
 import type { useEndpoints } from '@/composables/useEndpoints';
 import { apidog } from '@/services/apidog';
 import { useSession } from '@/stores/session';
@@ -16,6 +17,7 @@ const props = defineProps<{ projectId: number; endpoints: ReturnType<typeof useE
 
 const { state, selectEndpoint, bumpRevision } = useSession();
 const notify = useNotify();
+const { withBlocking } = useBusy();
 
 const showEndpointForm = ref(false);
 const defaultFolderId = ref(0);
@@ -39,7 +41,7 @@ async function deleteFolder(folder: Folder) {
   );
   if (!ok) return;
   try {
-    await apidog.deleteFolder(props.projectId, folder.id);
+    await withBlocking(`Eliminando carpeta "${folder.name}"…`, () => apidog.deleteFolder(props.projectId, folder.id));
     notify.success('Carpeta eliminada');
     bumpRevision();
   } catch (err) {
@@ -60,7 +62,8 @@ function onSaved(message: string) {
       <span>
         <button class="uk-icon-button uk-icon-button-small" uk-icon="folder" uk-tooltip="Nueva carpeta" @click="openFolderForm(null)"></button>
         <button class="uk-icon-button uk-icon-button-small uk-margin-small-left" uk-icon="plus" uk-tooltip="Nuevo endpoint" @click="openCreateEndpoint(0)"></button>
-        <button class="uk-icon-button uk-icon-button-small uk-margin-small-left" uk-icon="refresh" uk-tooltip="Recargar" :disabled="endpoints.loading.value" @click="endpoints.load"></button>
+        <span v-if="endpoints.loading.value" class="uk-margin-small-left" uk-spinner="ratio: 0.6"></span>
+        <button v-else class="uk-icon-button uk-icon-button-small uk-margin-small-left" uk-icon="refresh" uk-tooltip="Recargar" @click="endpoints.load"></button>
       </span>
     </div>
 
@@ -70,7 +73,7 @@ function onSaved(message: string) {
       v-model:status="endpoints.status.value"
     />
 
-    <div class="panel-content">
+    <div class="panel-content" :class="{ 'panel-loading': endpoints.loading.value && endpoints.endpoints.value.length }">
       <LoadingSpinner v-if="endpoints.loading.value && !endpoints.endpoints.value.length" label="Cargando endpoints…" />
       <ErrorAlert :error="endpoints.error.value" compact />
       <EndpointTree

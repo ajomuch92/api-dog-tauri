@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { useCliStatus } from '@/composables/useCliStatus';
 import { useNotify } from '@/composables/useNotify';
+import { useBusy } from '@/composables/useBusy';
 import { useSession } from '@/stores/session';
 
-const { status, logout, refresh } = useCliStatus();
+const { status, checking, logout, refresh } = useCliStatus();
+const { withBlocking } = useBusy();
 const { state } = useSession();
 const notify = useNotify();
 
 async function onLogout() {
   if (!(await notify.confirm('¿Cerrar la sesión del CLI de Apidog?', 'Cerrar sesión'))) return;
   try {
-    await logout();
+    await withBlocking('Cerrando sesión…', logout);
     notify.info('Sesión cerrada');
   } catch (err) {
     notify.error(err as never);
@@ -35,7 +37,8 @@ async function onLogout() {
         <span v-if="status?.user">{{ status.user.email }}</span>
       </div>
       <div class="uk-navbar-item">
-        <button class="uk-icon-button uk-margin-small-right" uk-icon="refresh" uk-tooltip="Revisar estado del CLI" @click="refresh"></button>
+        <span v-if="checking" class="uk-margin-small-right uk-icon-button" uk-spinner="ratio: 0.6"></span>
+        <button v-else class="uk-icon-button uk-margin-small-right" uk-icon="refresh" uk-tooltip="Revisar estado del CLI" @click="refresh"></button>
         <button class="uk-icon-button" uk-icon="sign-out" uk-tooltip="Cerrar sesión" @click="onLogout"></button>
       </div>
     </div>
