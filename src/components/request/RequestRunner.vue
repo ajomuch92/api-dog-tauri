@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import AuthEditor from './AuthEditor.vue';
 import KeyValueEditor from './KeyValueEditor.vue';
 import ResponseViewer from './ResponseViewer.vue';
 import ErrorAlert from '@/components/common/ErrorAlert.vue';
 import MethodBadge from '@/components/endpoints/MethodBadge.vue';
+import { useRequestAuth } from '@/composables/useRequestAuth';
 import { apidog, toCliError } from '@/services/apidog';
-import type { CliError, EndpointDetail, EndpointParameter, Environment, GlobalVariable, HttpResponseOutput, KeyValue } from '@/types/apidog';
+import { useSession } from '@/stores/session';
+import type { CliError, EndpointDetail, EndpointParameter, Environment, GlobalVariable, HttpResponseOutput, KeyValue, RequestAuth } from '@/types/apidog';
+import { applyAuth, authFromEndpoint, authSummary } from '@/utils/auth';
 import { exampleFromSchema, prettyJson } from '@/utils/json';
 import { buildRequestUrl, resolveVariables, toVariableMap, unresolvedVariables } from '@/utils/url';
 
@@ -20,7 +24,23 @@ const insecure = ref(false);
 const sending = ref(false);
 const response = ref<HttpResponseOutput | null>(null);
 const error = ref<CliError | null>(null);
-const section = ref<'query' | 'headers' | 'body'>('query');
+const section = ref<'query' | 'headers' | 'body' | 'auth'>('query');
+
+const { state: session } = useSession();
+const projectId = computed(() => props.endpoint.projectId ?? session.project?.id ?? null);
+const { auth, reset: resetAuth } = useRequestAuth(projectId);
+/** Auth definida en Apidog para este endpoint, con variables resueltas. */
+const suggestedAuth = computed<RequestAuth | null>(() => {
+  const mapped = authFromEndpoint(props.endpoint.auth);
+  if (!mapped) return null;
+  const r = (v: string) => resolveVariables(v, vars.value);
+  return { ...mapped, token: r(mapped.token), value: r(mapped.value), username: r(mapped.username), password: r(mapped.password) };
+});
+const authLabel = computed(() => authSummary(auth.value));
+
+function applySuggested() {
+  if (suggestedAuth.value) auth.value = { ...suggestedAuth.value };
+}
 
 const vars = computed(() => toVariableMap(props.variables));
 const selectedEnv = computed(() => props.environments.find((e) => e.id === envId.value) ?? null);
@@ -76,11 +96,12 @@ async function send() {
   error.value = null;
   response.value = null;
   try {
+    const withAuth = applyAuth(auth.value, headers.value, query.value);
     response.value = await apidog.sendRequest({
       method: props.endpoint.method,
       url: url.value,
-      query: query.value,
-      headers: headers.value,
+      query: withAuth.query,
+      headers: withAuth.headers,
       body: hasBody.value ? body.value : null,
       insecure: insecure.value,
     });
@@ -123,10 +144,16 @@ async function send() {
       <li :class="{ 'uk-active': section === 'query' }"><a href="#" @click.prevent="section = 'query'">Query ({{ query.length }})</a></li>
       <li :class="{ 'uk-active': section === 'headers' }"><a href="#" @click.prevent="section = 'headers'">Headers ({{ headers.length }})</a></li>
       <li v-if="hasBody" :class="{ 'uk-active': section === 'body' }"><a href="#" @click.prevent="section = 'body'">Body</a></li>
+      <li :class="{ 'uk-active': section === 'auth' }">
+        <a href="#" data-section="auth" @click.prevent="section = 'auth'">
+          <span uk-icon="icon: lock; ratio: 0.7" class="uk-margin-small-right"></span>Auth · {{ authLabel }}
+        </a>
+      </li>
     </ul>
 
     <KeyValueEditor v-if="section === 'query'" v-model="query" key-placeholder="parámetro" />
     <KeyValueEditor v-else-if="section === 'headers'" v-model="headers" key-placeholder="Header" />
+    <AuthEditor v-else-if="section === 'auth'" v-model="auth" :suggested="suggestedAuth" @apply-suggested="applySuggested" @reset="resetAuth" />
     <textarea v-else v-model="body" class="uk-textarea code-editor" rows="10" spellcheck="false"></textarea>
 
     <ErrorAlert :error="error" />

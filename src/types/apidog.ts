@@ -126,6 +126,7 @@ export interface EndpointDetail extends EndpointSummary {
   parameters?: EndpointParameters;
   requestBody?: EndpointRequestBody;
   responses?: EndpointResponse[];
+  auth?: EndpointAuth;
   projectId?: number;
   moduleId?: number;
   createdAt?: string;
@@ -198,4 +199,30 @@ export interface HttpResponseOutput {
   durationMs: number;
   sizeBytes: number;
   finalUrl: string;
+}
+
+// --- Autenticación del cliente ligero ---------------------------------------
+export type RequestAuthType = 'none' | 'bearer' | 'basic' | 'apikey' | 'custom';
+
+export interface RequestAuth {
+  type: RequestAuthType;
+  /** Bearer */
+  token: string;
+  /** Prefijo del esquema para bearer (por defecto "Bearer"). */
+  prefix: string;
+  /** Basic */
+  username: string;
+  password: string;
+  /** API key y custom */
+  key: string;
+  value: string;
+  addTo: 'header' | 'query';
+}
+
+/** Objeto `auth` tal como lo devuelve `apidog endpoint get`. */
+export interface EndpointAuth {
+  type?: string;
+  apikey?: { key?: string; value?: string; in?: 'header' | 'query' };
+  bearer?: { token?: string };
+  basic?: { username?: string; password?: string };
 }

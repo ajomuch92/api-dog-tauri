@@ -118,7 +118,15 @@ const handlers: Record<string, Handler> = {
       ['content-type', 'application/json'],
       ['x-mock', 'true'],
     ],
-    body: JSON.stringify({ ok: true, echo: { method: request.method, url: request.url } }),
+    body: JSON.stringify({
+      ok: true,
+      echo: {
+        method: request.method,
+        url: request.url,
+        headers: Object.fromEntries((request.headers as Array<{ key: string; value: string; enabled: boolean }>).filter((h) => h.enabled).map((h) => [h.key, h.value])),
+        query: Object.fromEntries((request.query as Array<{ key: string; value: string; enabled: boolean }>).filter((q) => q.enabled).map((q) => [q.key, q.value])),
+      },
+    }),
     durationMs: 42,
     sizeBytes: 64,
     finalUrl: request.url,

@@ -29,6 +29,7 @@ export const environments: Environment[] = [
 
 export const variables: GlobalVariable[] = [
   { name: 'CATALOG_URL', value: 'https://catalog.demo-shop.test/v1', description: 'Base del servicio de catálogo' },
+  { name: 'ACCESS_TOKEN', value: 'demo-token-123', description: 'Token de pruebas' },
 ];
 
 const baseDetail = (s: EndpointSummary): EndpointDetail => ({
@@ -50,6 +51,7 @@ export const details: Record<number, EndpointDetail> = Object.fromEntries(
 
 details[1002] = {
   ...details[1002],
+  auth: { type: 'bearer', bearer: { token: '{{ACCESS_TOKEN}}' } },
   description: 'Crea un producto nuevo dentro del catálogo.',
   tags: ['products', 'admin'],
   parameters: {
@@ -82,6 +84,7 @@ details[1002] = {
 
 details[1003] = {
   ...details[1003],
+  auth: { type: 'apikey', apikey: { key: 'X-API-Key', value: 'demo-key', in: 'header' } },
   parameters: {
     query: [{ id: 'dryRun#0', name: 'dryRun', required: false, type: 'boolean', example: 'false' }],
     path: [{ id: 'id#0', name: 'id', required: true, type: 'integer', example: '42' }],
