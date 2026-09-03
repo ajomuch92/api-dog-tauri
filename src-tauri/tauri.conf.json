@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "api-dog-tauri",
+  "productName": "Apidog Client",
   "version": "0.1.0",
   "identifier": "com.ajomuch92.api-dog-tauri",
   "build": {
@@ -12,9 +12,11 @@
   "app": {
     "windows": [
       {
-        "title": "api-dog-tauri",
-        "width": 800,
-        "height": 600
+        "title": "Apidog Client",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 600
       }
     ],
     "security": {
