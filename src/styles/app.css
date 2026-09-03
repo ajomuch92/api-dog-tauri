@@ -285,3 +285,60 @@ body,
   padding: 8px 0;
   border-top: 1px solid var(--app-border);
 }
+
+/* ---------- Feedback de carga ---------- */
+.global-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(30, 135, 240, 0.15);
+  overflow: hidden;
+  z-index: 2000;
+  pointer-events: none;
+}
+.global-progress-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 35%;
+  background: #1e87f0;
+  animation: progress-slide 1.1s ease-in-out infinite;
+}
+@keyframes progress-slide {
+  0% { left: -35%; }
+  100% { left: 100%; }
+}
+.busy-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(1px);
+}
+.busy-card {
+  text-align: center;
+  min-width: 240px;
+}
+.panel-loading {
+  position: relative;
+}
+.panel-loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}

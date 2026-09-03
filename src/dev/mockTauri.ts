@@ -15,6 +15,7 @@ type Args = Record<string, any>;
 type Handler = (args: Args) => unknown;
 
 const scenario = new URLSearchParams(location.search).get('mock') ?? 'app';
+const latency = new URLSearchParams(location.search).get('slow') ? 8000 : 350;
 let loggedIn = scenario !== 'logged-out';
 const installed = scenario !== 'not-installed';
 
@@ -50,7 +51,7 @@ const handlers: Record<string, Handler> = {
   list_projects: () => fx.projects,
   get_project: ({ projectId }) => fx.projects.find((p) => String(p.id) === projectId) ?? fail('Not found'),
 
-  list_endpoints: () => endpoints,
+  list_endpoints: () => [...endpoints],
   get_endpoint: ({ endpointId }) => details[Number(endpointId)] ?? fail('Not found'),
   create_endpoint: ({ payload }) => {
     if (!payload.method || !payload.path) fail('endpoint-create data file is invalid', 'validation');
@@ -88,7 +89,7 @@ const handlers: Record<string, Handler> = {
     delete details[Number(endpointId)];
   },
 
-  list_folders: () => folders,
+  list_folders: () => [...folders],
   create_folder: ({ name, parentId }) => {
     const f: Folder = { id: nextId++, name, parentId: parentId ?? 0, path: name };
     folders.push(f);
@@ -127,7 +128,7 @@ const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 (window as any).__TAURI_INTERNALS__ = {
   async invoke(cmd: string, args?: Args) {
-    await delay(40);
+    await delay(latency);
     const handler = handlers[cmd] ?? fail(`mock: comando "${cmd}" no implementado`);
     return handler(args ?? {});
   },

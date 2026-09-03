@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
+import { useSession } from '@/stores/session';
 import type {
   CliError,
   CliStatus,
@@ -25,10 +26,14 @@ export function toCliError(err: unknown): CliError {
 }
 
 async function call<T>(command: string, args?: Record<string, unknown>): Promise<T> {
+  const session = useSession();
+  session.beginCall();
   try {
     return await invoke<T>(command, args);
   } catch (err) {
     throw toCliError(err);
+  } finally {
+    session.endCall();
   }
 }
 
